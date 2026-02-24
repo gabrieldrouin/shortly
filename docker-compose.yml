@@ -68,6 +68,21 @@ services:
     networks:
       - url-shortener-net
 
+  shortener-service:
+    build: ./shortener-service
+    env_file: .env
+    environment:
+      PORT: "3001"
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - url-shortener-net
+
 volumes:
   pgdata:
   redisdata:
