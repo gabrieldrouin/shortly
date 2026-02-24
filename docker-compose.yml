@@ -83,6 +83,21 @@ services:
     networks:
       - url-shortener-net
 
+  redirect-service:
+    build: ./redirect-service
+    env_file: .env
+    environment:
+      PORT: "3000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - url-shortener-net
+
 volumes:
   pgdata:
   redisdata:
