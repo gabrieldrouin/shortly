@@ -1,0 +1,35 @@
+# Environment
+.env
+
+# Go binaries & build output
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/bin/
+/out/
+vendor/
+
+# Go test & coverage
+*.test
+*.out
+coverage.html
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker persistent volumes
+pgdata/
+redisdata/
+
+# Logs
+*.log
