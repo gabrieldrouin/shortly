@@ -9,16 +9,18 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/gabrieldrouin/shortly/redirect-service/internal/cache"
+	"github.com/gabrieldrouin/shortly/redirect-service/internal/kafka"
 	"github.com/gabrieldrouin/shortly/redirect-service/internal/repository"
 )
 
 type RedirectHandler struct {
-	repo  *repository.URLRepository
-	cache *cache.RedisCache
+	repo     *repository.URLRepository
+	cache    *cache.RedisCache
+	producer *kafka.Producer
 }
 
-func NewRedirectHandler(repo *repository.URLRepository, cache *cache.RedisCache) *RedirectHandler {
-	return &RedirectHandler{repo: repo, cache: cache}
+func NewRedirectHandler(repo *repository.URLRepository, cache *cache.RedisCache, producer *kafka.Producer) *RedirectHandler {
+	return &RedirectHandler{repo: repo, cache: cache, producer: producer}
 }
 
 func (h *RedirectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -30,6 +32,7 @@ func (h *RedirectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.Error("cache lookup failed", "error", err, "code", code)
 	}
 	if cached != "" {
+		h.publishClick(r, code)
 		http.Redirect(w, r, cached, http.StatusFound)
 		return
 	}
@@ -60,7 +63,14 @@ func (h *RedirectHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		slog.Error("failed to backfill cache", "error", err, "code", code)
 	}
 
+	h.publishClick(r, code)
 	http.Redirect(w, r, u.OriginalURL, http.StatusFound)
+}
+
+func (h *RedirectHandler) publishClick(r *http.Request, code string) {
+	if err := h.producer.PublishClick(r.Context(), code, r.UserAgent(), r.Referer()); err != nil {
+		slog.Error("failed to publish click event", "error", err, "code", code)
+	}
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) {

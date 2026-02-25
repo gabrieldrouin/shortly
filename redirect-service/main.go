@@ -16,6 +16,7 @@ import (
 	"github.com/gabrieldrouin/shortly/redirect-service/internal/cache"
 	"github.com/gabrieldrouin/shortly/redirect-service/internal/config"
 	"github.com/gabrieldrouin/shortly/redirect-service/internal/handler"
+	"github.com/gabrieldrouin/shortly/redirect-service/internal/kafka"
 	"github.com/gabrieldrouin/shortly/redirect-service/internal/repository"
 )
 
@@ -52,10 +53,15 @@ func main() {
 	}
 	slog.Info("connected to redis")
 
+	// Kafka
+	producer := kafka.NewProducer(cfg.KafkaBroker)
+	defer producer.Close()
+	slog.Info("kafka producer created", "broker", cfg.KafkaBroker)
+
 	// Dependencies
 	repo := repository.NewURLRepository(pool)
 	redisCache := cache.NewRedisCache(rdb)
-	redirectHandler := handler.NewRedirectHandler(repo, redisCache)
+	redirectHandler := handler.NewRedirectHandler(repo, redisCache, producer)
 
 	// Router
 	r := chi.NewRouter()

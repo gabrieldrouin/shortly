@@ -9,6 +9,7 @@ type Config struct {
 	Port        string
 	DatabaseURL string
 	RedisURL    string
+	KafkaBroker string
 }
 
 func Load() Config {
@@ -26,9 +27,15 @@ func Load() Config {
 		redisURL = "redis://localhost:6379"
 	}
 
+	kafkaBroker := os.Getenv("KAFKA_BROKER")
+	if kafkaBroker == "" {
+		kafkaBroker = "localhost:9092"
+	}
+
 	return Config{
 		Port:        port,
 		DatabaseURL: fmt.Sprintf("postgres://%s:%s@postgres:5432/%s?sslmode=disable", user, pass, db),
 		RedisURL:    redisURL,
+		KafkaBroker: kafkaBroker,
 	}
 }
