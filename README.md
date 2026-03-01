@@ -2,6 +2,8 @@
 
 A microservices URL shortener built with Go, designed to explore system design patterns: service decomposition, caching, async event pipelines, and horizontal scaling.
 
+<img width="695" height="487" alt="image" src="https://github.com/user-attachments/assets/38ac0e23-007a-4130-8512-298d9239c2f0" />
+
 ## Architecture
 
 ```mermaid
