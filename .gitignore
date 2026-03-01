@@ -31,5 +31,9 @@ Thumbs.db
 pgdata/
 redisdata/
 
+# Node / Frontend
+node_modules/
+frontend/dist/
+
 # Logs
 *.log
