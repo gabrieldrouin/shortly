@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS click_events (
     id BIGSERIAL PRIMARY KEY,
     short_code VARCHAR(10) NOT NULL,
     clicked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    referer TEXT,
+    referrer TEXT,
     user_agent TEXT
 );
 
